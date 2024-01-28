@@ -3,7 +3,7 @@ docker-ruoyi
 
 # 克隆 ruoyi
 git clone https://gitee.com/y_project/RuoYi-Vue.git ruoyi
-<br />
+<br/>
 ## 修改配置文件
 <br/>
 ruoyi/ruoyi-admin/src/resources/application-druid.yml
@@ -16,11 +16,16 @@ ruoyi/ruoyi-admin/src/resources/application-druid.yml
 <br/>
 ruoyi/ruoyi-admin/src/resources/application.yml
 <br/>
+第72行 redis 链接地址 localhost -> ruoyi-redis
+<br/>
 
+# 运行 docker-compose
+docker-compose up -d
 
 # 数据库导入
 ## phpmyadmin 导入数据 数据库名称：ruoyi
-! IP:62014 
+IP:62014
+http://localhost:62014
 
 # 若依 后台地址
 IP:62011
