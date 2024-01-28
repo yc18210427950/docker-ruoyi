@@ -2,8 +2,6 @@
 docker-ruoyi
 
 # 克隆 ruoyi
-mkdir -p ruoyi
-<br />
 git clone https://gitee.com/y_project/RuoYi-Vue.git ruoyi
 <br />
 ## 修改配置文件
