@@ -1,0 +1,112 @@
+version: "3"
+services:
+
+  ruoyi-admin:
+    image: bitnami/nginx:latest
+    container_name: ruoyi-admin
+    user: root
+    ports:
+      - "62011:62011"
+    volumes:
+      - ./data/admin:/admin
+      - ./my_server_block.conf:/opt/bitnami/nginx/conf/server_blocks/my_server_block.conf:ro
+    restart: always
+    networks:
+      - mynetwork
+
+  ruoyi-node:
+    # image: bitnami/nginx:latest
+    build:
+      context: .
+      dockerfile: Dockerfile-node
+    container_name: ruoyi-node
+    user: root
+    # ports:
+    #   - "62011:62911"
+    volumes:
+      - ./data/admin/dist:/app/prod:rw
+      # - ./my_server_block.conf:/opt/bitnami/nginx/conf/server_blocks/my_server_block.conf:ro
+    restart: always
+    tty: true
+    stdin_open: true
+    networks:
+      - mynetwork
+
+  ruoyi-java:
+    container_name: ruoyi-java
+    build:
+      context: .
+      dockerfile: Dockerfile-java8
+    tty: true
+    stdin_open: true
+    restart: always
+    volumes:
+      - ./data/jar:/java/jar
+    networks:
+      - mynetwork
+
+  ruoyi-mysql:
+    image: mysql
+    restart: always
+    container_name: ruoyi-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345678
+      MYSQL_DATABASE: ruoyi
+      TZ: Asia/Shanghai
+    # ports:
+    #   - 62021:3306
+    volumes:
+      - ./data/mysql:/var/lib/mysql:rw
+      # - ./config/mysql82/my.cnf:/etc/mysql/my.cnf
+      # - ./sql/:/docker-entrypoint-initdb.d
+    networks:
+      - mynetwork
+
+  ruoyi-phpmyadmin:
+    image: phpmyadmin
+    container_name: ruoyi-phpmyadmin
+    ports:
+      - '62014:80'
+      # - '62903:8443'
+    environment:
+      # MYSQL_USER: "root"
+      # MYSQL_PASSWORD: "12345678"
+      MYSQL_ROOT_PASSWORD: "12345678"
+      PMA_HOSTS: ruoyi-mysql
+      PMA_PORTS: 3306
+    #   - PMA_ARBITRARY=1
+    restart: always
+    networks:
+      - mynetwork
+
+  ruoyi-redis:
+    container_name: ruoyi-redis
+    image: redis:alpine
+    restart: always
+    # ports:
+    #   - "62015:6379"
+    volumes:
+      - ./data/redis/:/data/
+    networks:
+      - mynetwork
+
+  ruoyi-redis-commander:
+    container_name: ruoyi-redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:ruoyi-redis:6379
+    ports:
+      - "62016:8081"
+    networks:
+      - mynetwork
+
+
+networks:
+  mynetwork:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24
+          gateway: 172.16.238.1

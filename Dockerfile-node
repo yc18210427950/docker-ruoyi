@@ -1,0 +1,50 @@
+FROM node:16-alpine as build-stage
+
+USER root
+
+WORKDIR /app
+
+# RUN corepack enable
+# RUN corepack prepare pnpm@8.6.10 --activate
+
+RUN npm config set registry https://registry.npmmirror.com
+
+COPY ./ruoyi/ruoyi-ui/ .
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+
+RUN apk update
+
+# 设置时区 时间
+RUN apk add tzdata
+RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+RUN echo "Asia/Shanghai" > /etc/timezone
+
+RUN apk add curl wget vim git unzip
+
+RUN yarn
+
+RUN yarn build:prod
+
+
+# CMD yarn && yarn build:prod && cp -r dist/* prod
+
+CMD cp -r dist/* prod
+
+
+
+# FROM bitnami/node:16
+
+# WORKDIR /app
+
+# RUN npm config set registry https://registry.npmmirror.com
+
+# # RUN mkdir -p /app/prod
+
+# COPY ./ruoyi/ruoyi-ui/ .
+# # RUN npm i -g tyarn
+# # RUN tyarn
+# # RUN tyarn build:prod
+
+# # CMD npm i -g tyarn && tyarn && tyarn build:prod && cp -r dist/* prod
+# CMD npm i && npm run build:prod && cp -r dist/* prod

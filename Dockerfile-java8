@@ -1,0 +1,14 @@
+FROM maven:3.6-openjdk-8
+
+# 挂载目录
+VOLUME /java/
+# 创建目录
+RUN mkdir -p /java/
+RUN mkdir -p /java/jar
+# 指定路径
+WORKDIR /java/
+
+COPY ./ruoyi/ .
+
+# CMD mvn package && cp -r ruoyi-admin/target/ruoyi-admin.jar jar/ && java -jar ruoyi-admin/target/ruoyi-admin.jar
+CMD mvn package && cp -r ruoyi-admin/target/ruoyi-admin.jar jar/ && java -jar jar/ruoyi-admin.jar
